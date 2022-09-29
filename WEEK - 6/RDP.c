@@ -1,64 +1,129 @@
-digit [0-9]*
-id [a-zA-Z][a-zA-Z0-9]*
-num [0-9]\.[0-9]
-%{
 #include<stdio.h>
 #include<string.h>
-int i=0,j=0,cnt=0,n=0,com=0,scom=0;
-char st[10][10];
-int look_up(char st[10][10],char *id,int n);
-%}
-%%
-\n {scom=0;n++;}
-"//" {scom=1;printf("\n single line comment\n\n");}
-"/*" {com=1;printf("\n comment start\n");}
-"*/" {com=0;printf("\n comment end\n");}
-int |
-float |
-char |
-double |
-void {if(!com&&!scom) printf(" \n %s is keyword",yytext);}
-"<=" {if (!com&&!scom) printf("\n %s is Relational operator Lessthan or Equal to",yytext);}
-"<" {if(!com&&!scom) printf("\n %s is Relational operator Lessthan",yytext);}
-">=" {if(!com) printf("\n %s is Relational operator Greaterthan or Equal to",yytext);}
-">" {if(!com&&!scom) printf("\n %s is Relational operator Greaterthan",yytext);}
-"==" {if(!com&&!scom) printf("\n %s is Relational operator Equal to",yytext);}
-"!=" {if (!com&&!scom) printf("\n %s is Relational operator Not Equal to",yytext);}
-{id} {if(!com&&!scom) printf("\n %s is identifier",yytext); }
-{num} {if(!com&&!scom) printf("\n %s is float",yytext);}
-{digit} {if (!com&&!scom) printf("\n %s is digit",yytext);}
-%%
-
-main()
-
-
-
+int E(),Edash(),T(),Tdash(),F();
+char *ip;
+char string[50];
+int main()
 {
-yylex();
-printf(" No of id are : %d ",cnt);
-printf("\n the contents of symbol table are :\n");
-for(j=0;j<i;j++)
-printf("\n %s",st[j]);
+printf("Enter the string\n");
+scanf("%s",string);
+ip=string;
+printf("\n\nInput\tAction\n--------------------------------\n");
 
-yyin=fopen("x.txt","r");
-yyout=fopen("y.txt","w");
-printf(" No of id are : %d ",cnt);
-printf("\n the contents of symbol table are :\n");
-for(j=0;j<i;j++)
-printf("\n %s",st[j]);
+if(E() && ip==’\0’){
+printf("\n--------------------------------\n");
+printf("\n String is successfully parsed\n");
 }
-
-
-
-
-int yywrap()
+else{
+printf("\n--------------------------------\n");
+printf("Error in parsing String\n");
+}
+}
+int E()
+{
+printf("%s\tE->TE' \n",ip);
+if(T())
+{
+if(Edash())
 {
 return 1;
 }
-int lookup(char st[10][10],char *id,int n)
+else
+return 0;
+}
+else
+return 0;
+}
+int Edash()
 {
-for(j=0;j<n;j++)
-if(!strcmp(st[j],id))
+if(*ip=='+')
+{
+printf("%s\tE'->+TE' \n",ip);
+ip++;
+if(T())
+{
+if(Edash())
+{
 return 1;
+}
+else
+return 0;
+}
+else
+return 0;
+}
+else
+{
+printf("%s\tE'->^ \n",ip);
+return 1;
+}
+}
+int T()
+{
+printf("%s\tT->FT' \n",ip);
+if(F())
+{
+
+if(Tdash())
+{
+return 1;
+}
+else
+return 0;
+}
+else
+return 0;
+}
+int Tdash()
+{
+if(*ip=='*')
+{
+printf("%s\tT'->*FT' \n",ip);
+ip++;
+if(F())
+{
+if(Tdash())
+{
+return 1;
+}
+else
+return 0;
+}
+else
+return 0;
+}
+else
+{
+printf("%s\tT'->^ \n",ip);
+return 1;
+}
+}
+int F()
+{
+if(*ip=='(')
+{
+printf("%s\tF->(E) \n",ip);
+ip++;
+if(E())
+{
+if(*ip==')')
+{
+ip++;
+return 0;
+}
+else
+return 0;
+}
+else
+return 0;
+}
+
+else if(*ip=='i')
+{
+ip++;
+printf("%s\tF->id \n",ip);
+return 1;
+}
+else
 return 0;
 }
