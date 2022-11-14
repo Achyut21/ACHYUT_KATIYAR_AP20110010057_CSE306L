@@ -80,4 +80,4 @@ while(ip[i]!='\0')
 			error();
 	}
  }
-}//end of main
+}
